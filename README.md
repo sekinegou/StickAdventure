@@ -11,7 +11,7 @@
 * 回転：　　　　←→
 * リスタート：　R
 
-#実行ファイル
+# 実行ファイル
 Unity 2022.3.25でWindows用にビルドしました。StickAdventure内のBuildフォルダを解凍後、StickAdventureを実行してください。
 
 ## 使用したアセット（UnityのAssetStore）
