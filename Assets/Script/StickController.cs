@@ -5,18 +5,26 @@ using UnityEngine;
 
 public class StickController : MonoBehaviour
 {
-    
+    //プレイヤーの移動速度
     private const float posVelocity = 8.0f;
+    //プレイヤーの回転速度
     private const float rotVelocity = 100.0f;
 
+    //壁にぶつかったorリスタートした場合の再開座標
     public Vector3 restartPos;
+    //スタート・リスタート時のx座標
     private const float startPos = -7f;
+
+    //チェックポイントのx座標
     [SerializeField] private float[] checkPoint = new float[2];
     int i = 0;
 
+    //カメラのインスタンス
     public CameraController cameraController;
 
+    //ゴールしたかどうか
     public bool isGoal = false;
+    //リスタートしたかどうか
     public bool isRestart = false;
 
     AudioSource audioSource;
@@ -32,25 +40,31 @@ public class StickController : MonoBehaviour
     {
         isRestart = false;
 
+        //Rが押されたら
         if (Input.GetKeyDown(KeyCode.R))
         {
             restart();
         }
 
+        //ゴールしたら動けないようにする
         if (isGoal == true)
         {
             return;
         }
 
+        //プレイヤーがチェックポイントに到達したら
         if(transform.position.x >= checkPoint[i])
         {
+            //リスタート時の座標を更新
             restartPos.x = checkPoint[i];
+            //iが最後のチェックポイントの場合はインクリメントしない
             if (i < checkPoint.Length-1) i++;
         }
 
         stickMove();
     }
 
+    //リスタート時の処理
     void restart()
     {
         isGoal = false;
@@ -61,8 +75,10 @@ public class StickController : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
+    //プレイヤーの移動処理
     void stickMove()
     {
+        //WASDで移動
         if (Input.GetKey(KeyCode.A))
         {
             transform.Translate(-posVelocity * Time.deltaTime, 0, 0, Space.World);
@@ -80,6 +96,7 @@ public class StickController : MonoBehaviour
             transform.Translate(0, -posVelocity * Time.deltaTime, 0, Space.World);
         }
 
+        //←→で回転
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             transform.Rotate(0, 0, rotVelocity * Time.deltaTime);
@@ -90,21 +107,25 @@ public class StickController : MonoBehaviour
         }
     }
 
+    //衝突判定
     private void OnTriggerEnter2D(Collider2D collider)
     {
         if(collider.tag == "Wall")
         {
+            //リスタートの座標が初期位置なら、カメラを初期位置に戻す
             if (restartPos.x == -7f)
             {
                 cameraController.transform.position = new Vector3(0, 0, -10);
             }
 
+            //チェックポイントに戻る
             transform.position = restartPos;
             transform.rotation = Quaternion.Euler(0, 0, 0);
 
             audioSource.Play();
         }
 
+        //ゴール判定
         if(collider.tag == "Goal")
         {
             isGoal = true;
